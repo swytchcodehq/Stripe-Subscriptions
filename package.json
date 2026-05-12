@@ -4,16 +4,20 @@
   "private": true,
   "type": "module",
   "description": "Stripe Subscriptions monorepo built on Swytchcode",
-  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "services/*",
+    "shared/*",
+    "examples/*"
+  ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "build": "pnpm -r build",
-    "test": "pnpm -r test",
-    "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r typecheck",
-    "clean": "pnpm -r clean"
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present"
   },
   "devDependencies": {
     "typescript": "^5.5.0",
