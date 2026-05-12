@@ -24,13 +24,18 @@ planChangeRoutes.post("/preview", async (req: Request, res: Response) => {
     priceId: string;
     mode?: "upgrade_now" | "immediate_no_proration";
   };
-  const preview = await planChange.previewPlanChange({
-    accountId,
-    subscriptionId,
-    targets: [{ price: priceId, quantity: 1 }],
-    mode,
-  });
-  res.json(preview);
+  try {
+    const preview = await planChange.previewPlanChange({
+      accountId,
+      subscriptionId,
+      targets: [{ price: priceId, quantity: 1 }],
+      mode,
+    });
+    res.json(preview);
+  } catch (err) {
+    const code = (err as Error & { code?: string }).code;
+    res.status(400).json({ error: (err as Error).message, code });
+  }
 });
 
 planChangeRoutes.post("/apply", async (req: Request, res: Response) => {

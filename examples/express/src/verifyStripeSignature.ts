@@ -52,10 +52,10 @@ export function verifyStripeSignature(
     .createHmac("sha256", webhookSecret)
     .update(signedPayload, "utf8")
     .digest("hex");
-  const expectedBuf = Buffer.from(expected, "utf8");
+  const expectedBuf = Buffer.from(expected, "hex");
 
   const matched = v1List.some((candidate) => {
-    const candidateBuf = Buffer.from(candidate, "utf8");
+    const candidateBuf = Buffer.from(candidate, "hex");
     return (
       candidateBuf.length === expectedBuf.length &&
       crypto.timingSafeEqual(candidateBuf, expectedBuf)
