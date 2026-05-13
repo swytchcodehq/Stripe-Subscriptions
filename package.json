@@ -6,7 +6,6 @@
   "description": "Stripe Subscriptions monorepo built on Swytchcode",
   "workspaces": [
     "services/*",
-    "shared/*",
     "examples/*"
   ],
   "engines": {

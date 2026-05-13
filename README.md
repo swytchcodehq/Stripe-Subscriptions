@@ -37,7 +37,6 @@ Server starts at `http://localhost:3000`.
 | [`first-payment-recovery-service`](services/first-payment-recovery-service) | ready | Recover failed initial charges — declines, SCA/3DS, async payment methods |
 | [`renewal-recovery-service`](services/renewal-recovery-service) | ready | Dunning for renewals — `past_due` grace, `unpaid` lockout, `restored` on recovery |
 | `plan-change-service` | scaffold | Upgrades, downgrades, proration |
-| `customer-portal-service` | scaffold | Self-serve billing portal flows |
 | `entitlement-sync-service` | scaffold | Keep app entitlements in sync with Stripe |
 | `webhook-reliability-service` | scaffold | Idempotent, replayable webhook handling |
 
@@ -110,7 +109,6 @@ curl http://localhost:3000/activation/<accountId>
 
 ```
 services/   — subscription service modules (one problem per file)
-shared/     — cross-service types, utils, logger, storage, test helpers
-examples/   — reference integrations (Express, Next.js, Hono)
+examples/   — reference integrations (Express)
 docs/       — architecture, service index, local testing guide
 ```

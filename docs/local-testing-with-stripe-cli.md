@@ -34,11 +34,10 @@ stripe trigger customer.subscription.updated
 
 | Service | Useful triggers |
 |---|---|
-| `activation-service` | `customer.subscription.created`, `invoice.paid` |
+| `activation-service` | `checkout.session.completed`, `invoice.paid` |
 | `first-payment-recovery-service` | `invoice.payment_failed`, `invoice.payment_action_required`, `invoice.paid` (with `billing_reason=subscription_create`) |
 | `renewal-recovery-service` | `invoice.payment_failed` (with `billing_reason=subscription_cycle`) |
 | `plan-change-service` | `customer.subscription.updated` |
-| `customer-portal-service` | `billing_portal.session.created` |
 | `entitlement-sync-service` | `customer.subscription.updated`, `customer.subscription.deleted` |
 | `webhook-reliability-service` | any — used to test idempotency and replay |
 
