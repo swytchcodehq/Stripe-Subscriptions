@@ -59,14 +59,9 @@ cp .env.example examples/express/.env
 | Variable | Required | Where to get it |
 |---|---|---|
 | `STRIPE_SECRET_KEY` | Yes | [Stripe Dashboard → Developers → API keys](https://dashboard.stripe.com/test/apikeys) — use the `sk_test_...` key for local dev |
-| `STRIPE_PUBLISHABLE_KEY` | No | Same page as above — `pk_test_...` (only needed if your frontend calls Stripe.js directly) |
 | `STRIPE_WEBHOOK_SECRET` | Yes | Run `stripe listen --forward-to localhost:3000/webhooks/stripe` — the CLI prints a `whsec_...` value; paste it here |
-| `SWYTCHCODE_API_KEY` | Yes | [Swytchcode Dashboard](https://swytchcode.com) → Settings → API keys |
+| `SWYTCHCODE_TOKEN` | Yes | [Swytchcode Dashboard](https://swytchcode.com) → Settings → API keys |
 | `PORT` | No | Defaults to `3000` |
-| `NODE_ENV` | No | `development` locally, `production` in deployments |
-| `LOG_LEVEL` | No | `info` (options: `debug`, `info`, `warn`, `error`) |
-| `DATABASE_URL` | No | Your Postgres connection string — only required when using a persistent store instead of the in-memory default |
-| `REDIS_URL` | No | Your Redis connection string — only required for webhook deduplication in `webhook-reliability-service` |
 
 
 
