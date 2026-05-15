@@ -3,14 +3,14 @@
 ## Prerequisites
 
 - Node.js >= 20
-- pnpm >= 9
+- npm >= 10
 - Swytchcode CLI installed and authenticated (`swytchcode login`)
 - Stripe CLI for local webhook testing
 
 ## Workflow
 
 1. Fork / branch from `main`.
-2. Install: `pnpm install`.
+2. Install: `npm install`.
 3. Set up env: `cp .env.example .env` and fill in credentials.
 4. For any new Stripe integration call:
    - `swytchcode search` → find the integration
@@ -19,7 +19,7 @@
    - `swytchcode info <canonical_id>` to inspect the contract
    - Generate code that delegates to the Swytchcode runtime
 5. Add or update tests in the relevant service.
-6. Run `pnpm typecheck && pnpm lint && pnpm test` before opening a PR.
+6. Run `npm run typecheck && npm run lint && npm run test` before opening a PR.
 
 ## Commit style
 
