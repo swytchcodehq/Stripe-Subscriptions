@@ -75,12 +75,12 @@ Each service is a single-file, storage-agnostic module. You provide persistence;
 |---|---|---|
 | [`activation-service`](services/activation-service) | implemented + wired in the example | Convert sign-ups to active subscriptions — access granted only after verified `invoice.paid` |
 | [`first-payment-recovery-service`](services/first-payment-recovery-service) | implemented | Recover failed initial charges — declines, SCA/3DS, async payment methods |
-| [`renewal-recovery-service`](services/renewal-recovery-service) | implemented | Dunning for renewals — `past_due` grace, `unpaid` lockout, `restored` on recovery |
+| [`renewal-recovery-service`](services/renewal-recovery-service) | implemented; standalone example included | Dunning for renewals — `past_due` grace, `unpaid` lockout, `restored` on recovery |
 | [`plan-change-service`](services/plan-change-service) | implemented; example routes drafted, not yet mounted | Upgrades, downgrades, proration |
 | [`entitlement-sync-service`](services/entitlement-sync-service) | implemented; no example wiring yet | Keep app entitlements in sync with Stripe |
 | [`webhook-reliability-service`](services/webhook-reliability-service) | implemented; no example wiring yet | Idempotent, replayable webhook handling |
 
-> **Status note.** All six service modules are implemented as standalone TypeScript files with public APIs you can import today. They differ in how far the runnable Express example exercises them: `activation-service` is mounted end to end; `plan-change-service` has route handlers written in [`examples/express/src/planChangeRoutes.ts`](examples/express/src/planChangeRoutes.ts) that are not yet imported into the server; the remaining services have no example wiring. The docs elsewhere label the last three as "scaffold"; that refers to example coverage, not the modules, which are written. See [docs/service-index.md](docs/service-index.md).
+> **Status note.** All six service modules are implemented as standalone TypeScript files with public APIs you can import today. They differ in how far the runnable Express example exercises them: `activation-service` is mounted end to end in [`examples/express/src/server.ts`](examples/express/src/server.ts); `renewal-recovery-service` ships a standalone runnable example in [`services/renewal-recovery-service/example.ts`](services/renewal-recovery-service/example.ts); `plan-change-service` has route handlers written in [`examples/express/src/planChangeRoutes.ts`](examples/express/src/planChangeRoutes.ts) that are not yet imported into the server; `first-payment-recovery-service`, `entitlement-sync-service`, and `webhook-reliability-service` have no example wiring yet. The docs elsewhere label the last three as "scaffold"; that refers to example coverage, not the modules, which are written. See [docs/service-index.md](docs/service-index.md).
 
 ## Prerequisites
 
