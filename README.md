@@ -1,6 +1,16 @@
 # Stripe Subscriptions
 
-Production-ready Stripe subscription services built on [Swytchcode](https://swytchcode.com). Each service handles one subscription lifecycle problem and delegates all Stripe API calls to the Swytchcode runtime.
+> Subscription lifecycle services that turn Stripe's webhook-driven edge cases into ready-to-use modules, with every Stripe call delegated to the [Swytchcode](https://cli.swytchcode.com) runtime.
+
+[![Node 20+](https://img.shields.io/badge/node-20%2B-339933)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178c6)](https://www.typescriptlang.org/)
+[![Runtime: Swytchcode](https://img.shields.io/badge/runtime-Swytchcode-5b2bd6)](https://cli.swytchcode.com)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+
+Each service owns one subscription problem (activation, payment recovery, plan changes, entitlements, webhook reliability) and resolves it against verified Stripe events rather than the browser redirect. No Stripe SDK: the services call canonical Stripe methods through the Swytchcode runtime, which handles auth, validation, and idempotency.
+
+## Use cases
+
 | Use case                    | What it solves                                                                                                                                                                                                                                                                                                          |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Subscription activation     | Prevents developers from granting access too early, such as on Checkout redirect success instead of waiting for verified billing events like invoice.paid. Stripe explicitly recommends provisioning access when the invoice is successfully paid and the subscription is active. stripe+1                              |
@@ -19,10 +29,11 @@ npm install
 # 2. Copy and fill environment variables (see table above)
 cp .env.example examples/express/.env
 
-# 3. Install swytchcode
-Install CLI https://cli.swytchcode.com/
+# 3. Install the Swytchcode CLI
+curl -fsSL https://cli.swytchcode.com/install.sh | sh
+#    Windows (PowerShell): irm https://cli.swytchcode.com/install.ps1 | iex
 
-# 4. Initiate swytchcode
+# 4. Bootstrap the integrations declared in .swytchcode/tooling.json
 swytchcode bootstrap
 ```
 
@@ -37,16 +48,39 @@ npm run dev
 
 Server starts at `http://localhost:3000`.
 
+## Architecture
+
+Stripe subscriptions are webhook-driven, so each service is built around the events that actually move state. The Express example verifies the webhook signature once, then routes each event type to the service that owns it.
+
+```
+Stripe event ──► /webhooks/stripe (signature verified) ──► service handler ──► Swytchcode runtime
+```
+
+| Stripe event | Handled by | What it drives |
+|---|---|---|
+| `checkout.session.completed` | activation-service | Records the pending sign-up; does not grant access yet |
+| `invoice.paid` | activation-service | Grants access only after billing is verified |
+| `invoice.payment_failed` (first cycle) | first-payment-recovery-service | Classifies the failure (`requires_payment_method`, SCA/3DS, async, expired) and emits a next-action hint |
+| `invoice.payment_action_required` | first-payment-recovery-service | Surfaces the authentication step to the app |
+| `invoice.payment_failed` (renewals) | renewal-recovery-service | Dunning: `past_due` grace, `unpaid` lockout, `restored` on recovery |
+| `customer.subscription.updated` | plan-change-service | Applies upgrades, downgrades, and proration outcomes |
+| subscription state projection | entitlement-sync-service | Maps Stripe states to app entitlements (`active`, `grace`, `locked`) |
+| any event | webhook-reliability-service | Idempotent ingestion, dedupe, replay, out-of-order handling |
+
 ## Services
+
+Each service is a single-file, storage-agnostic module. You provide persistence; the service returns updated records to store.
 
 | Service | Status | Purpose |
 |---|---|---|
-| [`activation-service`](services/activation-service) | ready | Convert sign-ups to active subscriptions — access granted only after verified `invoice.paid` |
-| [`first-payment-recovery-service`](services/first-payment-recovery-service) | ready | Recover failed initial charges — declines, SCA/3DS, async payment methods |
-| [`renewal-recovery-service`](services/renewal-recovery-service) | ready | Dunning for renewals — `past_due` grace, `unpaid` lockout, `restored` on recovery |
-| `plan-change-service` | scaffold | Upgrades, downgrades, proration |
-| `entitlement-sync-service` | scaffold | Keep app entitlements in sync with Stripe |
-| `webhook-reliability-service` | scaffold | Idempotent, replayable webhook handling |
+| [`activation-service`](services/activation-service) | implemented + wired in the example | Convert sign-ups to active subscriptions — access granted only after verified `invoice.paid` |
+| [`first-payment-recovery-service`](services/first-payment-recovery-service) | implemented | Recover failed initial charges — declines, SCA/3DS, async payment methods |
+| [`renewal-recovery-service`](services/renewal-recovery-service) | implemented | Dunning for renewals — `past_due` grace, `unpaid` lockout, `restored` on recovery |
+| [`plan-change-service`](services/plan-change-service) | implemented; example routes drafted, not yet mounted | Upgrades, downgrades, proration |
+| [`entitlement-sync-service`](services/entitlement-sync-service) | implemented; no example wiring yet | Keep app entitlements in sync with Stripe |
+| [`webhook-reliability-service`](services/webhook-reliability-service) | implemented; no example wiring yet | Idempotent, replayable webhook handling |
+
+> **Status note.** All six service modules are implemented as standalone TypeScript files with public APIs you can import today. They differ in how far the runnable Express example exercises them: `activation-service` is mounted end to end; `plan-change-service` has route handlers written in [`examples/express/src/planChangeRoutes.ts`](examples/express/src/planChangeRoutes.ts) that are not yet imported into the server; the remaining services have no example wiring. The docs elsewhere label the last three as "scaffold"; that refers to example coverage, not the modules, which are written. See [docs/service-index.md](docs/service-index.md).
 
 ## Prerequisites
 
