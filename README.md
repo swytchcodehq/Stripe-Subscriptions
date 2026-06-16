@@ -30,8 +30,7 @@ npm install
 cp .env.example examples/express/.env
 
 # 3. Install the Swytchcode CLI
-curl -fsSL https://cli.swytchcode.com/install.sh | sh
-#    Windows (PowerShell): irm https://cli.swytchcode.com/install.ps1 | iex
+npm install -g swytchcode
 
 # 4. Bootstrap the integrations declared in .swytchcode/tooling.json
 swytchcode bootstrap
